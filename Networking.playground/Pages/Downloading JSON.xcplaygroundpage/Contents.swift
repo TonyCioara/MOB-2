@@ -110,6 +110,7 @@ session.dataTask(with: postReq) { (data, resp, err) in
 
 */
 
+var dogData: Any?
 var postReq2 = URLRequest(url: URL(string: "https://dog.ceo/api/breeds/list/all")!)
 
 postReq2.httpMethod = HttpMethods.get.rawValue
