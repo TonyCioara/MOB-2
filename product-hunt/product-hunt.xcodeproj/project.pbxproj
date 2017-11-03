@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		21325B7A1FACDF440035CCCA /* Posts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21325B791FACDF440035CCCA /* Posts.swift */; };
+		21325B7C1FACE0F70035CCCA /* Networking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21325B7B1FACE0F70035CCCA /* Networking.swift */; };
+		21325B7E1FACE2C30035CCCA /* Comments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21325B7D1FACE2C30035CCCA /* Comments.swift */; };
 		213800A81FAA90810060539C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 213800A71FAA90810060539C /* AppDelegate.swift */; };
 		213800AA1FAA90810060539C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 213800A91FAA90810060539C /* ViewController.swift */; };
 		213800AD1FAA90810060539C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 213800AB1FAA90810060539C /* Main.storyboard */; };
@@ -15,6 +18,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		21325B791FACDF440035CCCA /* Posts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Posts.swift; sourceTree = "<group>"; };
+		21325B7B1FACE0F70035CCCA /* Networking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Networking.swift; sourceTree = "<group>"; };
+		21325B7D1FACE2C30035CCCA /* Comments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comments.swift; sourceTree = "<group>"; };
 		213800A41FAA90810060539C /* product-hunt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "product-hunt.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		213800A71FAA90810060539C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		213800A91FAA90810060539C /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -57,6 +63,9 @@
 				213800A71FAA90810060539C /* AppDelegate.swift */,
 				213800A91FAA90810060539C /* ViewController.swift */,
 				213800AB1FAA90810060539C /* Main.storyboard */,
+				21325B7B1FACE0F70035CCCA /* Networking.swift */,
+				21325B7D1FACE2C30035CCCA /* Comments.swift */,
+				21325B791FACDF440035CCCA /* Posts.swift */,
 				213800AE1FAA90810060539C /* Assets.xcassets */,
 				213800B01FAA90810060539C /* LaunchScreen.storyboard */,
 				213800B31FAA90810060539C /* Info.plist */,
@@ -137,7 +146,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				213800AA1FAA90810060539C /* ViewController.swift in Sources */,
+				21325B7E1FACE2C30035CCCA /* Comments.swift in Sources */,
+				21325B7A1FACDF440035CCCA /* Posts.swift in Sources */,
 				213800A81FAA90810060539C /* AppDelegate.swift in Sources */,
+				21325B7C1FACE0F70035CCCA /* Networking.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
