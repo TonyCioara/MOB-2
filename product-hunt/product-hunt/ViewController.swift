@@ -18,9 +18,8 @@ class ViewController: UIViewController {
         Networking.instance.fetch(resource: Resource.posts) { (data) in
             
             let posts = try? JSONDecoder().decode(PostsList.self, from: data)
-            
-            
-            print(self.posts)
+            guard let allPosts = posts?.posts else {return}
+            self.list = allPosts
         }
         // Do any additional setup after loading the view, typically from a nib.
     }
@@ -29,7 +28,7 @@ class ViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
-
 }
+
+
 

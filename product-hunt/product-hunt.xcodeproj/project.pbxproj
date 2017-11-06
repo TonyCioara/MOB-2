@@ -15,6 +15,7 @@
 		213800AD1FAA90810060539C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 213800AB1FAA90810060539C /* Main.storyboard */; };
 		213800AF1FAA90810060539C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 213800AE1FAA90810060539C /* Assets.xcassets */; };
 		213800B21FAA90810060539C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 213800B01FAA90810060539C /* LaunchScreen.storyboard */; };
+		214018BE1FB019DD008936D8 /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 214018BD1FB019DD008936D8 /* TableViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		213800AE1FAA90810060539C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		213800B11FAA90810060539C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		213800B31FAA90810060539C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		214018BD1FB019DD008936D8 /* TableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +65,7 @@
 				213800A71FAA90810060539C /* AppDelegate.swift */,
 				213800A91FAA90810060539C /* ViewController.swift */,
 				213800AB1FAA90810060539C /* Main.storyboard */,
+				214018BD1FB019DD008936D8 /* TableViewController.swift */,
 				21325B7B1FACE0F70035CCCA /* Networking.swift */,
 				21325B7D1FACE2C30035CCCA /* Comments.swift */,
 				21325B791FACDF440035CCCA /* Posts.swift */,
@@ -146,6 +149,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				213800AA1FAA90810060539C /* ViewController.swift in Sources */,
+				214018BE1FB019DD008936D8 /* TableViewController.swift in Sources */,
 				21325B7E1FACE2C30035CCCA /* Comments.swift in Sources */,
 				21325B7A1FACDF440035CCCA /* Posts.swift in Sources */,
 				213800A81FAA90810060539C /* AppDelegate.swift in Sources */,

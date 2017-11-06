@@ -28,7 +28,7 @@ request.httpMethod = "GET"
 
 let session = URLSession.shared
 
-let task = session.dataTask(with: request) { (data, response, error) in
+let task = session.ddaataTask(with: request) { (data, response, error) in
     
     if let data = data {
         let json = try? JSONSerialization.jsonObject(with: data, options: .allowFragments)
