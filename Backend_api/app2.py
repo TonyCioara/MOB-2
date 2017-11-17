@@ -1,6 +1,7 @@
 import json
 from flask import Flask, request, make_response
 from flask_restful import Resource, Api
+from pymongo import ReturnDocument
 import pdb
 # 1
 from pymongo import MongoClient
@@ -69,14 +70,94 @@ class User(Resource):
         if user not in users_collection:
             result = users_collection.insert_one(new_user)
         else:
-            result = users_collection[user] = new_user
+            result = users_collection[new_user]
 
         json_result = JSONEncoder().encode(result)
 
         return json_result
 
 
+class Trip(Resource):
+
+    def get(self):
+        destination = request.args.get('destination')
+
+        trips_collection = app.db.trips
+
+        result = trips_collection.find_one({'destination': destination})
+
+        if result is not None:
+            return (result, 200, None)
+        else:
+            return(None, 404, None)
+
+    def post(self):
+
+        trips_collection = app.db.trips
+
+        # 2 parsed Request Body
+        new_destination = request.json
+
+        result = trips_collection.insert_one(new_destination)
+
+        trip = trips_collection.find_one({'_id': result.inserted_id})
+
+        # pdb.set_trace()
+
+        if result is not None:
+            return(trip, 201, {"Content-Type": "application/json", "User": "Tony TJ"})
+        else:
+            return (None, 400, None)
+
+    def put(self):
+
+        destination = request.args.get('destination')
+
+        trips_collection = app.db.trips
+
+        # 2 parsed Request Body
+        new_destination = request.json
+
+        result = trips_collection.find_one_and_replace({'destination': destination}, new_destination, return_document=ReturnDocument.AFTER)
+
+        # pdb.set_trace()
+
+        if result is not None:
+            return(result, 200, {"Content-Type": "application/json", "User": "Tony TJ"})
+        else:
+            return (None, 404, None)
+
+    def patch(self):
+
+        destination = request.args.get('destination')
+
+        trips_collection = app.db.trips
+
+        # 2 parsed Request Body
+        new_destination = request.json
+        set_values = {}
+        if 'destination' in new_destination:
+            set_values['destination'] = new_destination["destination"]
+        if 'trip_day_amount' in new_destination:
+            set_values['trip_day_amount'] = new_destination["trip_day_amount"]
+
+        mongo_set = {'$set': set_values}
+
+        result = trips_collection.find_one_and_update(
+            {'destination': destination},
+            mongo_set,
+            return_document=ReturnDocument.AFTER
+        )
+
+        if result is not None:
+            return(result, 200, {"Content-Type": "application/json", "User": "Tony TJ"})
+        else:
+            return (None, 404, None)
+
+
 api.add_resource(User, '/users')
+
+api.add_resource(Trip, '/trips')
 
 
 @api.representation('application/json')
