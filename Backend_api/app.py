@@ -1,7 +1,10 @@
 import json
-from flask import Flask, request
+from flask import Flask, request, make_response
+from flask_restful import Resource, Api
+from pymongo import ReturnDocument
 import pdb
 # 1
+import bcrypt
 from pymongo import MongoClient
 # For serialization
 from bson import Binary, Code
@@ -9,90 +12,230 @@ from bson.json_util import dumps
 
 from until import JSONEncoder
 app = Flask(__name__)
+api = Api(app)
 
-# 2
-mongo = MongoClient('localhost', 27017)
+# 2å
+mongo = MongoClient("mongodb://Tony:12345678@ds131687.mlab.com:31687/trip_planner_db")
 
 # 3
-app.db = mongo.local
+app.bcrypt_rounds = 12
+app.db = mongo.trip_planner_db
 
 
-@app.route('/person')
-def person_route():
-    person = {"name": "Eliel", 'age': 23}
-    json_person = json.dumps(person)
-    return (json_person, 200, None)
+def validate_auth(email, password):
+
+    user_collection = app.db.users
+    user = user_collection.find_one({'email': email})
+
+    if user is None:
+        return False
+    else:
+        encodedPassword = password.encode('utf-8')
+
+        if bcrypt.hashpw(encodedPassword, user['password']) == user['password']:
+            return True
+        else:
+            return False
 
 
-@app.route('/my_route')
-def my_route():
-    my_dict_from_json = request.json
+def authenticated_request(func):
 
-    json_representation = JSONEncoder.encode(my_dict_from_json)
+    def wrapper(*args, **kwargs):
+        auth = request.authorization
 
-    return (json_representation, 200, None)
+        if not auth or not validate_auth(auth.username, auth.password):
+            return ({'error': 'Basic Auth Required.'}, 401, None)
 
+        return func(*args, **kwargs)
 
-@app.route('/my_page')
-def my_page_route():
-    some_text = "I like cats"
-    return some_text
+    return wrapper
 
 
-@app.route('/users')
-def get_user():
+class User(Resource):
 
-    # 1 Get Url params
-    name = request.args.get('name')
-    request.json
+    def post(self):
 
-    # 2 Our users users collection
-    users_collection = app.db.users
+        users_collection = app.db.users
 
-    # 3 Find document in users collection
-    result = users_collection.find_one(
-        {'name': name}
-    )
+        # 2 parsed Request Body
+        new_user = request.json
 
-    # 4 Convert result to json from python dict
-    json_result = JSONEncoder().encode(result)
+        if ('password' in new_user and 'email' in new_user):
+            password = new_user['password']
+            encodedPassword = password.encode('utf-8')
 
-    # 5 Return json as part of the response body
-    return (json_result, 200, None)
+            hashed = bcrypt.hashpw(
+                encodedPassword, bcrypt.gensalt(app.bcrypt_rounds)
+            )
+
+        new_user['password'] = hashed
+
+        result = users_collection.insert_one(new_user)
+
+        user = users_collection.find_one({'_id': result.inserted_id})
+
+        if result is not None:
+            return(None, 201, {"Content-Type": "application/json", "User": "Tony"})
+        else:
+            return (None, 400, None)
+
+    @authenticated_request
+    def get(self):
+
+        # 1 Get Url params
+        email = request.authorization.username
+
+        # 2 Our users users collection
+        users_collection = app.db.users
+
+        # 3 Find document in users collection
+        result = users_collection.find_one(
+            {'email': email}
+        )
+
+        if result is not None:
+            result.pop('password')
+            return (result, 200, None)
+        else:
+            return(None, 404, None)
+
+    @authenticated_request
+    def put(self):
+
+        email = request.authorization.username
+
+        users_collection = app.db.users
+
+        # 2 parsed Request Body
+        new_user = request.json
+
+        result = users_collection.find_one_and_replace({'email': email}, new_user, return_document=ReturnDocument.AFTER)
+
+        # pdb.set_trace()
+
+        if result is not None:
+            result.pop('password')
+            return(result, 200, {"Content-Type": "application/json", "User": "Tony"})
+        else:
+            return (None, 404, None)
+
+    @authenticated_request
+    def patch(self):
+
+        email = request.authorization.username
+
+        users_collection = app.db.users
+
+        # 2 parsed Request Body
+        new_user = request.json
+        set_values = {}
+        if 'email' in new_user:
+            set_values['email'] = new_user["email"]
+        if 'trips' in new_user:
+            set_values['trips'] = new_user["trips"]
+
+        mongo_set = {'$set': set_values}
+
+        result = users_collection.find_one_and_update(
+            {'email': email},
+            mongo_set,
+            return_document=ReturnDocument.AFTER
+        )
+
+        if result is not None:
+            result.pop('password')
+            return(result, 200, {"Content-Type": "application/json", "User": "Tony"})
+        else:
+            return (None, 404, None)
 
 
-@app.route('/courses', methods = ['POST', 'GET'])
-def get_or_post_course():
+class Trip(Resource):
 
-    if request.method == 'POST':
-        courses_dict = request.json
-        print(courses_dict)
-        courses_collection = app.db.courses
+    def get(self):
+        destination = request.args.get('destination')
 
-        result = courses_collection.insert_one(courses_dict)
+        trips_collection = app.db.trips
 
-        # json_result = JSONEncoder().encode(courses_dict)
-        json_result = dumps(courses_dict)
+        result = trips_collection.find_one({'destination': destination})
 
-        return(json_result, 201, None)
-    elif request.method == 'GET':
-        courses_collection = app.db.courses
-        collection = courses_collection.find()
+        if result is not None:
+            return (result, 200, None)
+        else:
+            return(None, 404, None)
 
-        # json_result = JSONEncoder().encode(collection)
-        json_result = dumps(collection)
+    def post(self):
 
-        return (json_result, 200, None)
+        trips_collection = app.db.trips
+
+        # 2 parsed Request Body
+        new_destination = request.json
+
+        result = trips_collection.insert_one(new_destination)
+
+        trip = trips_collection.find_one({'_id': result.inserted_id})
+
+        # pdb.set_trace()
+
+        if result is not None:
+            return(trip, 201, {"Content-Type": "application/json", "User": "Tony TJ"})
+        else:
+            return (None, 400, None)
+
+    def put(self):
+
+        destination = request.args.get('destination')
+
+        trips_collection = app.db.trips
+
+        # 2 parsed Request Body
+        new_destination = request.json
+
+        result = trips_collection.find_one_and_replace({'destination': destination}, new_destination, return_document=ReturnDocument.AFTER)
+
+        # pdb.set_trace()
+
+        if result is not None:
+            return(result, 200, {"Content-Type": "application/json", "User": "Tony TJ"})
+        else:
+            return (None, 404, None)
+
+    def patch(self):
+
+        destination = request.args.get('destination')
+
+        trips_collection = app.db.trips
+
+        # 2 parsed Request Body
+        new_destination = request.json
+        set_values = {}
+        if 'destination' in new_destination:
+            set_values['destination'] = new_destination["destination"]
+        if 'trip_day_amount' in new_destination:
+            set_values['trip_day_amount'] = new_destination["trip_day_amount"]
+
+        mongo_set = {'$set': set_values}
+
+        result = trips_collection.find_one_and_update(
+            {'destination': destination},
+            mongo_set,
+            return_document=ReturnDocument.AFTER
+        )
+
+        if result is not None:
+            return(result, 200, {"Content-Type": "application/json", "User": "Tony TJ"})
+        else:
+            return (None, 404, None)
 
 
-@app.route('/pets')
-def pets_route():
-    pet_1 = {"name": "Cow", 'age': 230}
-    pet_2 = {"name": "Cat", 'age': 3}
-    pet_3 = {"name": "Dawg", 'age': 2}
-    pets = [pet_1, pet_2, pet_3]
-    json_pets = json.dumps(pets)
-    return json_pets
+api.add_resource(User, '/users')
+api.add_resource(Trip, '/trips')
+
+
+@api.representation('application/json')
+def output_json(data, code, headers=None):
+    resp = make_response(JSONEncoder().encode(data), code)
+    resp.headers.extend(headers or {})
+    return resp
 
 
 if __name__ == '__main__':
